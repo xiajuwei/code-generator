@@ -31,9 +31,10 @@
         SELECT
         <include refid="columns"/>
         FROM
-        ${table.tableName} a
-            WHERE
-        <#list table.pkColumnList as pk><#if pk_index gt 0> AND</#if> ${pk} = <#noparse>#{</#noparse>${table.pkPropertyList[pk_index]}<#noparse>}</#noparse></#list>
+    ${table.tableName} a
+        WHERE
+        <#list table.pkColumnList as pk><#if pk_index gt 0> AND</#if> ${pk} = <#noparse>
+            #{</#noparse>${table.pkPropertyList[pk_index]}<#noparse>}</#noparse></#list>
         <#list columns as col>
             <#if col.columnName=='is_delete'>
             AND ${col.columnName} = 0
@@ -45,18 +46,18 @@
     <insert id="add" useGeneratedKeys="true" keyProperty="id"
             parameterType="${cfg.baseDbBeanPackage}.${table.beanName}">
         INSERT INTO ${table.tableName}
-            (
-        <#list columns as col>
-        <#if col.columnName!='is_delete'>
-            `${col.columnName}`<#sep>,
-        </#if>
-        </#list>
-            )
-            VALUES
-            (
+        (
         <#list columns as col>
             <#if col.columnName!='is_delete'>
-            <#noparse>#{</#noparse>${col.propertyName}<#noparse>}</#noparse><#sep>,
+            `${col.columnName}`<#sep>,
+            </#if>
+        </#list>
+        )
+        VALUES
+        (
+        <#list columns as col>
+            <#if col.columnName!='is_delete'>
+                <#noparse>#{</#noparse>${col.propertyName}<#noparse>}</#noparse><#sep>,
             </#if>
         </#list>
 
@@ -71,13 +72,14 @@
             <#list crud_columns as col>
             <#if col.columnName!='is_delete'>
                 <if test="${col.propertyName} != null">
-            `${col.columnName}` = <#noparse>#{</#noparse>${col.propertyName}<#noparse>}</#noparse>,
+                    `${col.columnName}` = <#noparse>#{</#noparse>${col.propertyName}<#noparse>}</#noparse>,
                 </if>
             </#if>
 
             </#list>
         </set>
-        WHERE <#list table.pkColumnList as pk><#if pk_index gt 0> AND</#if> ${pk} = <#noparse>#{</#noparse>${table.pkPropertyList[pk_index]}<#noparse>}</#noparse></#list>
+        WHERE <#list table.pkColumnList as pk><#if pk_index gt 0> AND</#if> ${pk} = <#noparse>
+        #{</#noparse>${table.pkPropertyList[pk_index]}<#noparse>}</#noparse></#list>
         <#list columns as col>
             <#if col.columnName=='is_delete'>
             AND ${col.columnName} = 0
@@ -92,12 +94,13 @@
             <#list crud_columns as col>
             <#if col.columnName!='is_delete'>
                 <if test="${col.propertyName} != null">
-            `${col.columnName}` = <#noparse>#{</#noparse>${col.propertyName}<#noparse>}</#noparse>,
+                    `${col.columnName}` = <#noparse>#{</#noparse>${col.propertyName}<#noparse>}</#noparse>,
                 </if>
             </#if>
             </#list>
         </set>
-        WHERE <#list table.pkColumnList as pk><#if pk_index gt 0> AND</#if> ${pk} = <#noparse>#{</#noparse>${table.pkPropertyList[pk_index]}<#noparse>}</#noparse></#list>
+        WHERE <#list table.pkColumnList as pk><#if pk_index gt 0> AND</#if> ${pk} = <#noparse>
+        #{</#noparse>${table.pkPropertyList[pk_index]}<#noparse>}</#noparse></#list>
         <#list columns as col>
             <#if col.columnName=='is_delete'>
             AND ${col.columnName} = 0
@@ -107,8 +110,13 @@
 
     <!--根据主键删除实体-->
     <delete id="delete">
-        DELETE
-        FROM ${table.tableName} WHERE <#list table.pkColumnList as pk><#if pk_index gt 0> AND</#if> ${pk} = <#noparse>#{</#noparse>${table.pkPropertyList[pk_index]}<#noparse>}</#noparse></#list>
+        UPDATE ${table.tableName} SET is_delete=1  WHERE <#list table.pkColumnList as pk><#if pk_index gt 0> AND</#if> ${pk} = <#noparse>
+        #{</#noparse>${table.pkPropertyList[pk_index]}<#noparse>}</#noparse></#list>
+        <#list columns as col>
+            <#if col.columnName=='is_delete'>
+            AND ${col.columnName} = 0
+            </#if>
+        </#list>
     </delete>
 
     <!--分页查询-->
@@ -116,7 +124,7 @@
         SELECT
         <include refid="columns"/>
         FROM
-        ${table.tableName} a
+    ${table.tableName} a
         ORDER BY id DESC
     </select>
 </mapper>
