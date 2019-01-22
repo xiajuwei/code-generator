@@ -11,18 +11,18 @@
     <!--查询字段-->
     <sql id="columns">
         <#list columns as col>
-        <#if col.columnName!='is_delete'>
-            a.${col.columnName}<#if col_has_next>,</#if>
-        </#if>
+            <#if col.columnName!='is_delete'>
+                a.${col.columnName}<#if col_has_next>,</#if>
+            </#if>
         </#list>
     </sql>
 
     <!--查询结果集-->
     <resultMap id="beanMap" type="${cfg.baseDbBeanPackage}.${table.beanName}">
         <#list columns as col>
-        <#if col.columnName!='is_delete'>
-            <result property="${col.propertyName}" column="${col.columnName}"/>
-        </#if>
+            <#if col.columnName!='is_delete'>
+                <result property="${col.propertyName}" column="${col.columnName}"/>
+            </#if>
         </#list>
     </resultMap>
 
@@ -36,7 +36,7 @@
         <#list table.pkColumnList as pk><#if pk_index gt 0> AND</#if> ${pk} = <#noparse>#{</#noparse>${table.pkPropertyList[pk_index]}<#noparse>}</#noparse></#list>
         <#list columns as col>
             <#if col.columnName=='is_delete'>
-            AND ${col.columnName} = 0
+                AND ${col.columnName} = 0
             </#if>
         </#list>
     </select>
@@ -47,19 +47,18 @@
         INSERT INTO ${table.tableName}
             (
         <#list columns as col>
-        <#if col.columnName!='is_delete'>
-            `${col.columnName}`<#sep>,
-        </#if>
+            <#if col.columnName!='is_delete'>
+                `${col.columnName}`,
+            </#if>
         </#list>
             )
             VALUES
             (
         <#list columns as col>
             <#if col.columnName!='is_delete'>
-            <#noparse>#{</#noparse>${col.propertyName}<#noparse>}</#noparse><#sep>,
+                <#noparse>#{</#noparse>${col.propertyName}<#noparse>}</#noparse>,
             </#if>
         </#list>
-
         )
     </insert>
 
@@ -69,18 +68,17 @@
         UPDATE ${table.tableName}
         <set>
             <#list crud_columns as col>
-            <#if col.columnName!='is_delete'>
-                <if test="${col.propertyName} != null">
-            `${col.columnName}` = <#noparse>#{</#noparse>${col.propertyName}<#noparse>}</#noparse>,
-                </if>
-            </#if>
-
+                <#if col.columnName!='is_delete'>
+                    <if test="${col.propertyName} != null">
+                `${col.columnName}` = <#noparse>#{</#noparse>${col.propertyName}<#noparse>}</#noparse>,
+                    </if>
+                </#if>
             </#list>
         </set>
         WHERE <#list table.pkColumnList as pk><#if pk_index gt 0> AND</#if> ${pk} = <#noparse>#{</#noparse>${table.pkPropertyList[pk_index]}<#noparse>}</#noparse></#list>
         <#list columns as col>
             <#if col.columnName=='is_delete'>
-            AND ${col.columnName} = 0
+                AND ${col.columnName} = 0
             </#if>
         </#list>
     </update>
@@ -90,33 +88,36 @@
         UPDATE ${table.tableName}
         <set>
             <#list crud_columns as col>
-            <#if col.columnName!='is_delete'>
-                <if test="${col.propertyName} != null">
-            `${col.columnName}` = <#noparse>#{</#noparse>${col.propertyName}<#noparse>}</#noparse>,
-                </if>
-            </#if>
+                <#if col.columnName!='is_delete'>
+                    <if test="${col.propertyName} != null">
+                `${col.columnName}` = <#noparse>#{</#noparse>${col.propertyName}<#noparse>}</#noparse>,
+                    </if>
+                </#if>
             </#list>
         </set>
         WHERE <#list table.pkColumnList as pk><#if pk_index gt 0> AND</#if> ${pk} = <#noparse>#{</#noparse>${table.pkPropertyList[pk_index]}<#noparse>}</#noparse></#list>
         <#list columns as col>
             <#if col.columnName=='is_delete'>
-            AND ${col.columnName} = 0
+                AND ${col.columnName} = 0
             </#if>
         </#list>
     </update>
 
     <!--根据主键删除实体-->
     <delete id="delete">
-        DELETE
-        FROM ${table.tableName} WHERE <#list table.pkColumnList as pk><#if pk_index gt 0> AND</#if> ${pk} = <#noparse>#{</#noparse>${table.pkPropertyList[pk_index]}<#noparse>}</#noparse></#list>
+        UPDATE ${table.tableName} SET is_delete=1 WHERE <#list table.pkColumnList as pk><#if pk_index gt 0> AND</#if> ${pk} = <#noparse>#{</#noparse>${table.pkPropertyList[pk_index]}<#noparse>}</#noparse></#list>
     </delete>
-
     <!--分页查询-->
     <select id="listByPage" resultMap="beanMap">
         SELECT
         <include refid="columns"/>
         FROM
         ${table.tableName} a
+        <#list columns as col>
+            <#if col.columnName=='is_delete'>
+                WHERE is_delete=0
+            </#if>
+        </#list>
         ORDER BY id DESC
     </select>
 </mapper>
